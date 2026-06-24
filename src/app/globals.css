@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-dark: var(--brand-dark);
+}
+
+:root {
+  --brand: #2563eb;
+  /* blue-600 */
+  --brand-hover: #1d4ed8;
+  /* blue-700 */
+  --brand-dark: #3b82f6;
+  /* blue-500 */
+
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --scrollbar-track: #f8fafc;
+  --scrollbar-thumb: var(--brand);
+  --scrollbar-thumb-hover: var(--brand-hover);
+  --scrollbar-border: #f8fafc;
+}
+
+.dark {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --scrollbar-track: #0f172a;
+  --scrollbar-thumb: var(--brand-dark);
+  --scrollbar-thumb-hover: #60a5fa;
+  /* blue-400 */
+  --scrollbar-border: #0f172a;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
