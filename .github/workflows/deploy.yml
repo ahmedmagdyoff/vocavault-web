@@ -16,7 +16,8 @@ jobs:
           script: |
             export PATH=/home/ahmedmagdy-vocavault/.nvm/versions/node/v22.23.1/bin:$PATH
             cd /home/ahmedmagdy-vocavault/htdocs/vocavault.ahmedmagdy.cloud
-            git pull
+            git fetch origin
+            git reset --hard origin/main
             npm install
             npm run build
             pm2 restart vocavault
