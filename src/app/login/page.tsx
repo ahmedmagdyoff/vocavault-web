@@ -19,7 +19,7 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && user) {
-      router.replace('/words');
+      router.replace('/');
     }
   }, [user, authLoading, router]);
 
@@ -30,7 +30,7 @@ export default function LoginPage() {
     try {
       await login({ email, password });
       toast.success('Logged in successfully');
-      router.push('/words');
+      router.push('/');
     } catch (error: any) {
       toast.error(error.message || 'Login failed');
     } finally {

@@ -21,7 +21,7 @@ export default function RegisterPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && user) {
-      router.replace('/words');
+      router.replace('/');
     }
   }, [user, authLoading, router]);
 
@@ -36,7 +36,7 @@ export default function RegisterPage() {
     try {
       await register({ name, email, password, password_confirmation: passwordConfirmation });
       toast.success('Account created successfully');
-      router.push('/words');
+      router.push('/');
     } catch (error: any) {
       if (error.errors) {
         // Display validation errors
