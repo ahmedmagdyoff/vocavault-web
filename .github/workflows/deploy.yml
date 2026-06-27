@@ -1,11 +1,18 @@
 name: VPS Deploy
+
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - Build Check
+    types:
+      - completed
+
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     runs-on: ubuntu-latest
+
     steps:
       - name: VPS Deploy
         uses: appleboy/ssh-action@v1.2.0
@@ -15,11 +22,17 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             export PATH=/home/ahmedmagdy-vocavault/.nvm/versions/node/v22.23.1/bin:$PATH
+
             cd /home/ahmedmagdy-vocavault/htdocs/vocavault.ahmedmagdy.cloud
+
             git fetch origin
             git reset --hard origin/main
+
             npm ci
             npm run build
+
             pm2 restart vocavault
+
             sleep 5
+
             curl -f https://vocavault.ahmedmagdy.cloud
