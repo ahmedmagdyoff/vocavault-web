@@ -1,4 +1,3 @@
-````md
 <div align="center">
 
 # 🌐 VocaVault Web
@@ -128,4 +127,3 @@ Every push to the `main` branch runs:
 # 📄 License
 
 This project is licensed under the **MIT License**.
-````
