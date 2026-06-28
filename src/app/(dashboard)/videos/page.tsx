@@ -4,12 +4,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Plus, Video as VideoIcon, Search, Trash2, Edit } from 'lucide-react';
 import { videosApi } from '@/lib/videos';
-import { Video } from '@/types';
+import { Video as VideoType } from '@/types';
 import toast from 'react-hot-toast';
 import VideoModal from '@/components/VideoModal';
 
 export default function VideosPage() {
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<VideoType[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,7 +40,7 @@ export default function VideosPage() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (video: Video) => {
+  const openEditModal = (video: VideoType) => {
     setEditingId(video.id);
     setNewVideo({ title: video.title, url: video.url, platform: video.platform });
     setIsModalOpen(true);

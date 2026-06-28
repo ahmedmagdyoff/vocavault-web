@@ -49,3 +49,31 @@ export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;
 }
+
+// --- Request payload types ---
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export interface CreateVideoPayload {
+  title: string;
+  url: string;
+  platform: string;
+}
+
+export interface CreateWordPayload {
+  word: string;
+  meaning: string;
+  category_id?: number;
+  video_ids?: number[];
+  forms?: { form_type: string; value: string }[];
+}

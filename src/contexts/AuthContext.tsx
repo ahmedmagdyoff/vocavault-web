@@ -1,15 +1,15 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, AuthResponse } from '@/types';
+import { User, AuthResponse, LoginCredentials, RegisterCredentials } from '@/types';
 import { auth as authApi } from '@/lib/auth';
 import { useRouter, usePathname } from 'next/navigation';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (data: any) => Promise<AuthResponse>;
-  register: (data: any) => Promise<AuthResponse>;
+  login: (credentials: LoginCredentials) => Promise<AuthResponse>;
+  register: (credentials: RegisterCredentials) => Promise<AuthResponse>;
   logout: () => Promise<void>;
 }
 
@@ -48,14 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('auth-error', handleAuthError);
   }, [pathname, router]);
 
-  const login = async (data: any) => {
-    const response = await authApi.login(data);
+  const login = async (credentials: LoginCredentials) => {
+    const response = await authApi.login(credentials);
     setUser(response.user);
     return response;
   };
 
-  const register = async (data: any) => {
-    const response = await authApi.register(data);
+  const register = async (credentials: RegisterCredentials) => {
+    const response = await authApi.register(credentials);
     setUser(response.user);
     return response;
   };

@@ -1,22 +1,22 @@
 import { fetchApi } from './api';
-import { Word } from '@/types';
+import { Word, CreateWordPayload } from '@/types';
 
 export const wordsApi = {
   async getWords(): Promise<{ data: Word[] }> {
     return fetchApi<{ data: Word[] }>('/api/words');
   },
 
-  async createWord(data: any): Promise<{ data: Word }> {
+  async createWord(payload: CreateWordPayload): Promise<{ data: Word }> {
     return fetchApi<{ data: Word }>('/api/words', {
       method: 'POST',
-      body: JSON.stringify(data),
+      data: payload,
     });
   },
 
-  async updateWord(id: number, data: any): Promise<{ data: Word }> {
+  async updateWord(id: number, payload: CreateWordPayload): Promise<{ data: Word }> {
     return fetchApi<{ data: Word }>(`/api/words/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      data: payload,
     });
   },
 

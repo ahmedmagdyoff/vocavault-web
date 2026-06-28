@@ -4,20 +4,18 @@ export const apiConfig = {
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
 };
 
-// Create an Axios instance
 const apiClient = axios.create({
   baseURL: apiConfig.baseURL,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-  withCredentials: true, // Crucial for Sanctum SPA Auth
-  withXSRFToken: true,   // Crucial for cross-origin XSRF token attachment
+  withCredentials: true,
+  withXSRFToken: true,
   xsrfCookieName: 'XSRF-TOKEN',
   xsrfHeaderName: 'X-XSRF-TOKEN',
 });
 
-// Interceptor to handle 401 Unauthorized
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -28,28 +26,38 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Wrapper to mimic the previous fetchApi signature and return only data
-export async function fetchApi<T>(endpoint: string, options: any = {}): Promise<T> {
-  const method = options.method || 'GET';
-  const data = options.body ? JSON.parse(options.body) : undefined;
-  const params = options.params;
+export class ApiError extends Error {
+  status: number;
+  errors?: Record<string, string[]>;
 
+  constructor(status: number, message: string, errors?: Record<string, string[]>) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.errors = errors;
+  }
+}
+
+export async function fetchApi<T>(endpoint: string, options: {
+  method?: string;
+  data?: unknown;
+  params?: Record<string, unknown>;
+} = {}): Promise<T> {
   try {
     const response = await apiClient.request<T>({
       url: endpoint,
-      method,
-      data,
-      params,
-      headers: options.headers,
+      method: options.method || 'GET',
+      data: options.data,
+      params: options.params,
     });
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
-      throw {
-        status: error.response.status,
-        message: error.response.data.message || 'An error occurred',
-        errors: error.response.data.errors,
-      };
+      throw new ApiError(
+        error.response.status,
+        error.response.data.message || 'An error occurred',
+        error.response.data.errors,
+      );
     }
     throw error;
   }

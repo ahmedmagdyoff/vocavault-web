@@ -1,22 +1,22 @@
 import { fetchApi } from './api';
-import { Video } from '@/types';
+import { Video, CreateVideoPayload } from '@/types';
 
 export const videosApi = {
   async getVideos(): Promise<{ data: Video[] }> {
     return fetchApi<{ data: Video[] }>('/api/videos');
   },
 
-  async createVideo(data: any): Promise<{ data: Video }> {
+  async createVideo(payload: CreateVideoPayload): Promise<{ data: Video }> {
     return fetchApi<{ data: Video }>('/api/videos', {
       method: 'POST',
-      body: JSON.stringify(data),
+      data: payload,
     });
   },
 
-  async updateVideo(id: number, data: any): Promise<{ data: Video }> {
+  async updateVideo(id: number, payload: CreateVideoPayload): Promise<{ data: Video }> {
     return fetchApi<{ data: Video }>(`/api/videos/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      data: payload,
     });
   },
 
