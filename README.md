@@ -84,7 +84,7 @@ npm run build
 Create a `.env.local` file.
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8000/api
+NEXT_PUBLIC_API_URL=http://api.vocavault.ahmedmagdy.cloud/api
 ```
 
 ---
