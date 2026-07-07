@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const apiConfig = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://api.vocavault.ahmedmagdy.cloud',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
 };
 
 const apiClient = axios.create({
