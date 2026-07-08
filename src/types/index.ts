@@ -74,6 +74,6 @@ export interface CreateWordPayload {
   word: string;
   meaning: string;
   category_id?: number;
-  video_ids?: number[];
+  video_id?: number | null;
   forms?: { form_type: string; value: string }[];
 }

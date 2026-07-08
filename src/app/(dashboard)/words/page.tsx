@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Plus, Search, Trash2, Edit } from 'lucide-react';
 import { Word } from '@/types';
 import { useVocabularyData } from '@/hooks/useVocabularyData';
-import { wordsApi } from '@/lib/words';
+import { wordsApi, BulkReportRow } from '@/lib/words';
 import { formatFormType } from '@/lib/formatFormType';
 import toast from 'react-hot-toast';
 import VideoModal from '@/components/VideoModal';
@@ -26,11 +26,26 @@ export default function WordsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
 
+  const [mode, setMode] = useState<'single' | 'bulk'>('single');
+  const [bulkInput, setBulkInput] = useState('');
+  const [bulkReport, setBulkReport] = useState<BulkReportRow[] | null>(null);
+
+  const handleModeChange = (newMode: 'single' | 'bulk') => {
+    setMode(newMode);
+    if (newMode === 'single') {
+      setBulkInput('');
+      setBulkReport(null);
+    } else {
+      setFormData(prev => ({ ...prev, word: '', meaning: '', forms: {} }));
+      setBulkReport(null);
+    }
+  };
+
   const [formData, setFormData] = useState({
     word: '',
     meaning: '',
     category_id: '',
-    video_ids: [] as number[],
+    video_id: null as number | null,
     forms: {} as Record<string, string>,
   });
 
@@ -49,8 +64,11 @@ export default function WordsPage() {
 
   const openAddModal = () => {
     setEditingId(null);
-    setFormData({ word: '', meaning: '', category_id: '', video_ids: [], forms: {} });
+    setFormData({ word: '', meaning: '', category_id: '', video_id: null, forms: {} });
     setVideoSearchQuery('');
+    setMode('single');
+    setBulkInput('');
+    setBulkReport(null);
     setIsModalOpen(true);
   };
 
@@ -67,7 +85,7 @@ export default function WordsPage() {
       word: word.word,
       meaning: word.meaning,
       category_id: word.category_id ? word.category_id.toString() : '',
-      video_ids: word.videos?.map(v => v.id) || [],
+      video_id: word.videos && word.videos.length > 0 ? word.videos[0].id : null,
       forms: formRecord,
     });
     setVideoSearchQuery('');
@@ -78,26 +96,43 @@ export default function WordsPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const formsPayload = Object.entries(formData.forms)
-        .filter(([, value]) => value.trim() !== '')
-        .map(([form_type, value]) => ({ form_type, value }));
-
-      const payload = {
-        ...formData,
-        category_id: formData.category_id ? parseInt(formData.category_id) : undefined,
-        forms: formsPayload.length > 0 ? formsPayload : undefined,
-      };
-
-      if (editingId) {
-        const res = await wordsApi.updateWord(editingId, payload);
-        setWords(prev => prev.map(w => w.id === editingId ? res.data : w));
-        toast.success('Word updated successfully');
-      } else {
-        const res = await wordsApi.createWord(payload);
-        setWords(prev => [res.data, ...prev]);
-        toast.success('Word added successfully');
+      if (!formData.video_id) {
+        toast.error('Please select exactly one video');
+        return;
       }
-      setIsModalOpen(false);
+
+      if (mode === 'bulk') {
+        const payload = {
+          rows: bulkInput,
+          category_id: formData.category_id,
+          video_id: formData.video_id,
+        };
+        const res = await wordsApi.bulkCreateWords(payload);
+        setBulkReport(res.report);
+        const wordsRes = await wordsApi.getWords();
+        setWords(wordsRes.data);
+      } else {
+        const formsPayload = Object.entries(formData.forms)
+          .filter(([, value]) => value.trim() !== '')
+          .map(([form_type, value]) => ({ form_type, value }));
+
+        const payload = {
+          ...formData,
+          category_id: formData.category_id ? parseInt(formData.category_id) : undefined,
+          forms: formsPayload.length > 0 ? formsPayload : undefined,
+        };
+
+        if (editingId) {
+          const res = await wordsApi.updateWord(editingId, payload);
+          setWords(prev => prev.map(w => w.id === editingId ? res.data : w));
+          toast.success('Word updated successfully');
+        } else {
+          const res = await wordsApi.createWord(payload);
+          setWords(prev => [res.data, ...prev]);
+          toast.success('Word added successfully');
+        }
+        setIsModalOpen(false);
+      }
     } catch {
       toast.error(`Failed to ${editingId ? 'update' : 'add'} word`);
     } finally {
@@ -208,6 +243,11 @@ export default function WordsPage() {
         videos={videos}
         videoSearchQuery={videoSearchQuery}
         setVideoSearchQuery={setVideoSearchQuery}
+        mode={mode}
+        setMode={handleModeChange}
+        bulkInput={bulkInput}
+        setBulkInput={setBulkInput}
+        bulkReport={bulkReport}
       />
 
       <WordDetailsModal
