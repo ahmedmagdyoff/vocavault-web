@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Video, Category } from '@/types';
 import { getGrammaticalFields } from '@/lib/grammaticalFields';
 import { BulkReportRow } from '@/lib/words';
+import SearchableVideoSelect from '@/components/SearchableVideoSelect';
 
 interface WordFormModalProps {
   isOpen: boolean;
@@ -21,8 +22,6 @@ interface WordFormModalProps {
   setFormData: React.Dispatch<React.SetStateAction<WordFormModalProps['formData']>>;
   categories: Category[];
   videos: Video[];
-  videoSearchQuery: string;
-  setVideoSearchQuery: (query: string) => void;
   mode?: 'single' | 'bulk';
   setMode?: (mode: 'single' | 'bulk') => void;
   bulkInput?: string;
@@ -40,8 +39,6 @@ export default function WordFormModal({
   setFormData,
   categories,
   videos,
-  videoSearchQuery,
-  setVideoSearchQuery,
   mode = 'single',
   setMode,
   bulkInput = '',
@@ -55,10 +52,6 @@ export default function WordFormModal({
     : null;
 
   const grammaticalFields = getGrammaticalFields(selectedCategoryName);
-
-  const filteredVideos = videos.filter(v =>
-    v.title.toLowerCase().includes(videoSearchQuery.toLowerCase())
-  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -102,14 +95,33 @@ export default function WordFormModal({
           </div>
         ) : (
           <form onSubmit={onSubmit} className="space-y-4">
+            <div className="pt-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Video *</label>
+              <SearchableVideoSelect 
+                videos={videos} 
+                value={formData.video_id} 
+                onChange={(id) => setFormData(prev => ({ ...prev, video_id: id }))} 
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Category *</label>
+              <select required value={formData.category_id} onChange={e => setFormData(prev => ({...prev, category_id: e.target.value, forms: {}}))} className="mt-1 w-full rounded-md border border-slate-300 p-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white">
+                <option value="">Select Category</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+
             {mode === 'single' ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Word</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Word *</label>
                   <input required type="text" value={formData.word} onChange={e => setFormData(prev => ({...prev, word: e.target.value}))} className="mt-1 w-full rounded-md border border-slate-300 p-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Meaning</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Meaning *</label>
                   <input required type="text" value={formData.meaning} onChange={e => setFormData(prev => ({...prev, meaning: e.target.value}))} className="mt-1 w-full rounded-md border border-slate-300 p-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
                 </div>
               </>
@@ -136,7 +148,7 @@ export default function WordFormModal({
 
             {mode === 'bulk' && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Words Data (CSV)</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Words Data (CSV) *</label>
                 <textarea 
                   required 
                   rows={5} 
@@ -155,45 +167,6 @@ export default function WordFormModal({
                 </p>
               </div>
             )}
-            
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Category</label>
-              <select required value={formData.category_id} onChange={e => setFormData(prev => ({...prev, category_id: e.target.value, forms: {}}))} className="mt-1 w-full rounded-md border border-slate-300 p-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white">
-                <option value="">Select Category</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
-
-          <div className="pt-2">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Videos</label>
-
-            <input
-              type="text"
-              placeholder="Search videos..."
-              value={videoSearchQuery}
-              onChange={(e) => setVideoSearchQuery(e.target.value)}
-              className="w-full rounded-md border border-slate-300 p-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-            />
-            <div className="mt-2 max-h-32 overflow-y-auto rounded-md border border-slate-200 p-2 dark:border-slate-800 space-y-1">
-              {filteredVideos.map(video => (
-                <label key={video.id} className="flex items-center space-x-3 py-1.5 px-2 rounded hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
-                  <input
-                    type="radio"
-                    name="selected_video"
-                    checked={formData.video_id === video.id}
-                    onChange={() => setFormData(prev => ({ ...prev, video_id: video.id }))}
-                    className="rounded-full border-slate-300 text-brand focus:ring-brand h-4 w-4 dark:border-slate-700 dark:bg-slate-900"
-                  />
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{video.title}</span>
-                </label>
-              ))}
-              {filteredVideos.length === 0 && (
-                <p className="text-sm text-slate-500 dark:text-slate-400 p-2 text-center">No videos found.</p>
-              )}
-            </div>
-          </div>
           <div className="mt-6 flex justify-end gap-3">
             <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
             <Button type="submit" disabled={isSubmitting} isLoading={isSubmitting}>

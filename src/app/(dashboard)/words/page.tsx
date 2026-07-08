@@ -18,7 +18,6 @@ export default function WordsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [videoSearchQuery, setVideoSearchQuery] = useState('');
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedWord, setSelectedWord] = useState<Word | null>(null);
   const [playingVideo, setPlayingVideo] = useState<{ url: string; title: string } | null>(null);
@@ -65,7 +64,6 @@ export default function WordsPage() {
   const openAddModal = () => {
     setEditingId(null);
     setFormData({ word: '', meaning: '', category_id: '', video_id: null, forms: {} });
-    setVideoSearchQuery('');
     setMode('single');
     setBulkInput('');
     setBulkReport(null);
@@ -88,7 +86,7 @@ export default function WordsPage() {
       video_id: word.videos && word.videos.length > 0 ? word.videos[0].id : null,
       forms: formRecord,
     });
-    setVideoSearchQuery('');
+    setMode('single');
     setIsModalOpen(true);
   };
 
@@ -241,8 +239,6 @@ export default function WordsPage() {
         setFormData={setFormData}
         categories={categories}
         videos={videos}
-        videoSearchQuery={videoSearchQuery}
-        setVideoSearchQuery={setVideoSearchQuery}
         mode={mode}
         setMode={handleModeChange}
         bulkInput={bulkInput}
