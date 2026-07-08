@@ -110,7 +110,7 @@ export default function WordFormModal({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Meaning</label>
-                  <textarea required rows={2} value={formData.meaning} onChange={e => setFormData(prev => ({...prev, meaning: e.target.value}))} className="mt-1 w-full rounded-md border border-slate-300 p-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
+                  <input required type="text" value={formData.meaning} onChange={e => setFormData(prev => ({...prev, meaning: e.target.value}))} className="mt-1 w-full rounded-md border border-slate-300 p-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
                 </div>
               </>
             ) : null}
